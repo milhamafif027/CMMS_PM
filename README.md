@@ -1,5 +1,5 @@
 ## ServerApp : Back End
-## informasiMesin : Front End
+## InformasiMesin : Front End
 
 
 # Tampilan Page Informasi Mesin (Dashboard) 
