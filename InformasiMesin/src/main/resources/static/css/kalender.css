@@ -1,0 +1,345 @@
+/* ==============================================
+   ROOT VARIABLES
+   ============================================== */
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #27ae60; /* Warna hijau utama */
+  --success-color: #2ecc71; /* Warna hijau sekunder */
+  --background-color: #ecf0f1;
+  --text-color: #2c3e50;
+  --border-radius: 12px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==============================================
+   CARD STYLING
+   ============================================== */
+.card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 30px;
+  margin: 20px;
+  transition: var(--transition);
+}
+
+.card h2 {
+  color: var(--primary-color);
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  position: relative;
+}
+
+.card h2::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--success-color);
+  border-radius: 2px;
+}
+
+/* ==============================================
+   CALENDAR CONTAINER
+   ============================================== */
+#calendar-container {
+  padding: 25px;
+  background: white;
+  border-radius: var(--border-radius);
+}
+
+/* ==============================================
+   FULLCALENDAR CUSTOMIZATION
+   ============================================== */
+.fc {
+  font-family: "Inter", sans-serif;
+}
+
+.fc-toolbar-title {
+  color: var(--primary-color) !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+.fc-button-primary {
+  background-color: var(--secondary-color) !important;
+  border-color: var(--secondary-color) !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  transition: var(--transition) !important;
+}
+
+.fc-button-primary:hover {
+  background-color: #219653 !important; /* Warna hijau yang lebih gelap */
+  border-color: #219653 !important;
+  transform: translateY(-2px);
+}
+
+.fc-day {
+  transition: var(--transition);
+}
+
+.fc-day:hover {
+  background-color: #f8f9fa;
+}
+
+.fc-daygrid-day-number {
+  color: var(--text-color);
+  font-weight: 500;
+  padding: 8px !important;
+}
+
+.fc-daygrid-event {
+  background-color: var(--success-color) !important;
+  border-color: var(--success-color) !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+}
+
+/* ==============================================
+   MODAL STYLING
+   ============================================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  transition: var(--transition);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 25px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--background-color);
+  position: relative;
+}
+
+.modal-header h3 {
+  color: var(--primary-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  background: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  background: #f8f9fa;
+  color: #dc3545;
+  transform: rotate(90deg);
+}
+
+/* ==============================================
+   INPUT GROUP STYLING
+   ============================================== */
+.input-group {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text-color);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--background-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: var(--transition);
+  background: #f8f9fa;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+  border-color: var(--secondary-color);
+  outline: none;
+  background: white;
+  box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1); /* Warna hijau untuk focus */
+}
+
+.input-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ==============================================
+   ENTITY SUGGESTIONS STYLING
+   ============================================== */
+.entity-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--background-color);
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  z-index: 1002;
+  margin-top: 5px;
+}
+
+.entity-suggestion-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: var(--transition);
+  border-bottom: 1px solid var(--background-color);
+}
+
+.entity-suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.entity-suggestion-item:hover {
+  background-color: #f8f9fa;
+  padding-left: 20px;
+}
+
+/* ==============================================
+   BUTTON STYLING
+   ============================================== */
+.btn-save {
+  background: linear-gradient(
+    145deg,
+    var(--secondary-color),
+    #219653
+  ); /* Gradien hijau */
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: var(--transition);
+  width: 100%;
+  margin-top: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3); /* Shadow hijau */
+}
+
+.btn-save:active {
+  transform: translateY(0);
+}
+
+/* ==============================================
+   RADIO BUTTON GROUP STYLING
+   ============================================== */
+.radio-group {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* ==============================================
+   FORM TOGGLE STYLING
+   ============================================== */
+#reschedule-form {
+  display: none;
+}
+
+/* ==============================================
+   RESPONSIVE DESIGN
+   ============================================== */
+@media (max-width: 768px) {
+  .fc-toolbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal {
+    width: 90%;
+    padding: 20px;
+    max-height: 80vh; /* Tinggi maksimal dikurangi */
+    overflow-y: auto;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    padding: 10px 12px;
+  }
+
+  .btn-save {
+    padding: 10px 20px;
+  }
+}

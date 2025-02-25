@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html
+  lang="id"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title
+      layout:title-pattern="$CONTENT_TITLE - Preventive Maintenance"
+    ></title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <th:block layout:fragment="css"></th:block>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <img src="image/logo tel.jpg" alt="Preventive Maintenance Logo" />
+      </div>
+      <ul class="menu">
+        <li
+          class="menu-item"
+          th:classappend="${activePage == 'index' ? 'active' : ''}"
+        >
+          <a th:href="@{/}">
+            <i class="fas fa-home"></i> <span>Dashboard</span>
+          </a>
+        </li>
+        <li
+          class="menu-item"
+          th:classappend="${activePage == 'kalender' ? 'active' : ''}"
+        >
+          <a th:href="@{/kalender}">
+            <i class="fas fa-calendar"></i> <span>Kalender</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Header -->
+      <header class="header">
+        <h1 layout:fragment="title">Dashboard</h1>
+        <div class="user-profile">
+          <i class="fas fa-user-circle"></i>
+          <span>Andi - Suvervisor</span>
+          <button class="btn btn-danger">Logout</button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main layout:fragment="content"></main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        &copy; 2025 Preventive Maintenance - All rights reserved.
+      </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/script.js}"></script>
+    <th:block layout:fragment="scripts"></th:block>
+  </body>
+</html>

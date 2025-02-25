@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html
+  lang="id"
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout}"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Pemeliharaan</title>
+
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css"
+    />
+    <link rel="stylesheet" th:href="@{/css/index.css}" />
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+    <script th:src="@{/js/index.js}"></script>
+  </head>
+
+  <body>
+    <div layout:fragment="content">
+      <!-- Machine List Section -->
+      <section class="card fade-in" aria-labelledby="machine-list-title">
+        <h2 id="machine-list-title">Daftar Mesin</h2>
+        <!-- Image Slider -->
+        <div class="swiper-container">
+          <div class="swiper">
+            <div class="swiper-wrapper">
+              <div class="swiper-slide">
+                <img src="image/Mesin 1.jpg" alt="Mesin 1" />
+              </div>
+              <div class="swiper-slide">
+                <img src="image/Mesin 2.jpg" alt="Mesin 2" />
+              </div>
+            </div>
+          </div>
+          <div class="swiper-pagination"></div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-card">
+          <h3 class="filter-title">Opsi Filter</h3>
+          <div class="filter-group">
+            <label for="filter-entityNo">Nomor Entitas:</label>
+            <input
+              type="text"
+              id="filter-entityNo"
+              placeholder="Cari berdasarkan No. Entitas..."
+            />
+          </div>
+          <div class="filter-group">
+            <label for="filter-entityName">Nama Entitas:</label>
+            <input
+              type="text"
+              id="filter-entityName"
+              placeholder="Cari berdasarkan Nama Entitas..."
+            />
+          </div>
+        </div>
+
+        <!-- Tambah Mesin Button -->
+        <div class="add-machine-container">
+          <button id="open-add-modal" class="btn btn-add">
+            <span class="btn-text">Tambah Mesin</span>
+          </button>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>No. Entitas</th>
+                <th>Nama Entitas</th>
+                <th>Merek/Tipe</th>
+                <th>Qty (grm)</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="machine-list">
+              <!-- data tabel lewat backend-->
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <!-- Modal Tambah Mesin -->
+      <div class="modal-overlay" id="add-modal-overlay">
+        <div class="modal" id="add-machine-modal">
+          <div class="modal-header">
+            <h3>Tambah Mesin Baru</h3>
+            <button id="close-add-modal" class="close-btn">&times;</button>
+          </div>
+          <div class="modal-content">
+            <form id="add-machine-form">
+              <div class="form-group">
+                <label for="new-entity-no">Nomor Entitas:</label>
+                <input
+                  type="text"
+                  id="new-entity-no"
+                  placeholder="Masukkan No. Entitas"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="new-entity-name">Nama Entitas:</label>
+                <input
+                  type="text"
+                  id="new-entity-name"
+                  placeholder="Masukkan Nama Entitas"
+                  requireda
+                />
+              </div>
+              <div class="form-group">
+                <label for="new-brand">Merek/Tipe:</label>
+                <input
+                  type="text"
+                  id="new-brand"
+                  placeholder="Masukkan Merek/Tipe"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="new-qty">Qty (grm):</label>
+                <input
+                  type="number"
+                  id="new-qty"
+                  placeholder="Masukkan Qty"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn-save">Simpan Mesin</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Detail -->
+      <div class="modal-overlay" id="detail-modal-overlay">
+        <div class="modal" id="detail-modal">
+          <div class="modal-header">
+            <h3>Detail Mesin</h3>
+            <button type="button" class="close-btn" id="close-detail-modal">
+              &times;
+            </button>
+          </div>
+          <div class="modal-content">
+            <div class="detail-group">
+              <label>ID</label>
+              <p id="modal-id"></p>
+            </div>
+            <div class="detail-group">
+              <label>Nomor Entitas</label>
+              <p id="modal-entity-no"></p>
+            </div>
+            <div class="detail-group">
+              <label>Nama Entitas</label>
+              <p id="modal-entity-name"></p>
+            </div>
+            <div class="detail-group">
+              <label>Merek/Tipe</label>
+              <p id="modal-brand"></p>
+            </div>
+            <div class="detail-group">
+              <label>Qty (grm)</label>
+              <p id="modal-qty"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
