@@ -8,10 +8,12 @@ import com.example.serverapp.repository.MesinRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
 public class MaintenanceScheduleService {
+
     @Autowired
     private MaintenanceScheduleRepository maintenanceRepository;
 
@@ -28,17 +30,7 @@ public class MaintenanceScheduleService {
         return schedules;
     }
 
-    // Ambil jadwal untuk laporan bulanan berdasarkan mesin
-    @Transactional(readOnly = true)
-    public List<MaintenanceSchedule> getMonthlyReport(Long mesinId, Integer year, String bulan) {
-        List<MaintenanceSchedule> reports = maintenanceRepository.findByMesinIdAndTahunAndBulan(mesinId, year, bulan);
-        if (reports.isEmpty()) {
-            throw new ResourceNotFoundException("Tidak ada laporan bulanan untuk mesin ID: " + mesinId + " bulan " + bulan + " tahun " + year);
-        }
-        return reports;
-    }
-
-    // Ambil laporan bulanan untuk semua mesin
+    // Ambil laporan bulanan berdasarkan tahun dan nama bulan
     @Transactional(readOnly = true)
     public List<MaintenanceSchedule> getMonthlyReport(Integer year, String month) {
         List<MaintenanceSchedule> reports = maintenanceRepository.findByTahunAndBulan(year, month);
@@ -48,7 +40,19 @@ public class MaintenanceScheduleService {
         return reports;
     }
 
-    // Ambil mesin berdasarkan entity number
+    // Konversi angka bulan menjadi nama bulan
+    public String getMonthName(Integer month) {
+        String[] months = {
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        };
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Bulan tidak valid: " + month);
+        }
+        return months[month - 1];
+    }
+
+    // Ambil mesin berdasarkan nomor entitas
     @Transactional(readOnly = true)
     public Mesin findMesinByEntityNo(String entityNo) {
         return mesinRepository.findByEntityNo(entityNo)

@@ -3,51 +3,75 @@ package com.example.serverapp.controller;
 import com.example.serverapp.model.MaintenanceSchedule;
 import com.example.serverapp.model.Mesin;
 import com.example.serverapp.service.MaintenanceScheduleService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.serverapp.service.PdfGenerationService;
+import com.itextpdf.text.DocumentException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/maintenance")
 @CrossOrigin(origins = "*")
 public class MaintenanceController {
-    @Autowired
-    private MaintenanceScheduleService maintenanceService;
 
-    // Ambil jadwal berdasarkan mesin dan tahun
-    @GetMapping("/mesin/{mesinId}/year/{year}")
-    public List<MaintenanceSchedule> getSchedule(@PathVariable Long mesinId, @PathVariable Integer year) {
-        return maintenanceService.getScheduleByMesinAndYear(mesinId, year);
+    private final MaintenanceScheduleService maintenanceService;
+    private final PdfGenerationService pdfGenerationService;
+
+    public MaintenanceController(MaintenanceScheduleService maintenanceService, PdfGenerationService pdfGenerationService) {
+        this.maintenanceService = maintenanceService;
+        this.pdfGenerationService = pdfGenerationService;
     }
 
-    // Ambil laporan bulanan
-    @GetMapping("/mesin/{mesinId}/year/{year}/month/{bulan}")
-    public List<MaintenanceSchedule> getMonthlyReport(
-            @PathVariable Long mesinId,
-            @PathVariable Integer year,
-            @PathVariable String bulan) {
-        return maintenanceService.getMonthlyReport(mesinId, year, bulan);
+    @GetMapping("/mesin/{mesinId}/year/{year}")
+    public ResponseEntity<List<MaintenanceSchedule>> getSchedule(@PathVariable Long mesinId, @PathVariable Integer year) {
+        return ResponseEntity.ok(maintenanceService.getScheduleByMesinAndYear(mesinId, year));
     }
 
     @GetMapping("/all-machines/year/{year}")
-    public List<MaintenanceSchedule> getAllSchedulesByYear(@PathVariable Integer year) {
-        return maintenanceService.getAllSchedulesByYear(year);
+    public ResponseEntity<List<MaintenanceSchedule>> getAllSchedulesByYear(@PathVariable Integer year) {
+        return ResponseEntity.ok(maintenanceService.getAllSchedulesByYear(year));
     }
 
     @GetMapping("/mesin/by-number/{entityNo}")
-    public Mesin getMesinByEntityNo(@PathVariable String entityNo) {
-        return maintenanceService.findMesinByEntityNo(entityNo);
+    public ResponseEntity<Mesin> getMesinByEntityNo(@PathVariable String entityNo) {
+        return ResponseEntity.ok(maintenanceService.findMesinByEntityNo(entityNo));
     }
 
     @GetMapping("/mesin")
-    public List<Mesin> getAllMesin() {
-        return maintenanceService.getAllMesin();
+    public ResponseEntity<List<Mesin>> getAllMesin() {
+        return ResponseEntity.ok(maintenanceService.getAllMesin());
     }
 
-    // Simpan jadwal baru atau reschedule
     @PostMapping
-    public MaintenanceSchedule createSchedule(@RequestBody MaintenanceSchedule schedule) {
-        return maintenanceService.saveSchedule(schedule);
+    public ResponseEntity<MaintenanceSchedule> createSchedule(@RequestBody MaintenanceSchedule schedule) {
+        return ResponseEntity.ok(maintenanceService.saveSchedule(schedule));
+    }
+
+    @GetMapping("/report/monthly")
+    public ResponseEntity<List<MaintenanceSchedule>> getMonthlyReport(
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+        String monthName = maintenanceService.getMonthName(month); // Konversi angka bulan ke nama bulan
+        return ResponseEntity.ok(maintenanceService.getMonthlyReport(year, monthName));
+    }
+
+    @GetMapping("/report/monthly/pdf")
+    public ResponseEntity<byte[]> downloadMonthlyReportPdf(
+            @RequestParam Integer year,
+            @RequestParam Integer month) throws IOException, DocumentException {
+        String monthName = maintenanceService.getMonthName(month); // Konversi angka bulan ke nama bulan
+        List<MaintenanceSchedule> schedules = maintenanceService.getMonthlyReport(year, monthName);
+        byte[] pdfBytes = pdfGenerationService.generateMonthlyReportPdf(schedules, monthName, year);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "laporan-bulanan-" + monthName + "-" + year + ".pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
     }
 }
