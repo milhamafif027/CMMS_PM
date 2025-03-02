@@ -24,7 +24,19 @@
   <body>
     <div layout:fragment="content">
       <section class="card fade-in">
-        <h2>Kalender Pemeliharaan</h2>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+          "
+        >
+          <h2>Kalender Pemeliharaan</h2>
+          <button id="print-report" class="btn btn-save btn-report">
+            Cetak Laporan Bulanan
+          </button>
+        </div>
 
         <div id="calendar-container">
           <div id="calendar"></div>
@@ -65,11 +77,9 @@
         <div id="schedule-form">
           <div class="input-group">
             <label for="entity-number">Nomor Entitas</label>
-            <input
-              type="text"
-              id="entity-number"
-              placeholder="Masukkan nomor entitas..."
-            />
+            <select id="entity-number">
+              <option value="">Pilih Nomor Entitas</option>
+            </select>
           </div>
 
           <div class="input-group">
@@ -109,12 +119,9 @@
         <div id="reschedule-form" style="display: none">
           <div class="input-group">
             <label for="reschedule-entity-number">Nomor Entitas</label>
-            <input
-              type="text"
-              id="reschedule-entity-number"
-              placeholder="Masukkan nomor entitas..."
-            />
-            <input type="hidden" id="reschedule-mesin-id" />
+            <select id="reschedule-entity-number">
+              <option value="">Pilih Nomor Entitas</option>
+            </select>
           </div>
 
           <div class="input-group">

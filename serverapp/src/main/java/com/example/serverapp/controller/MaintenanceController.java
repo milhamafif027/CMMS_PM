@@ -30,9 +30,19 @@ public class MaintenanceController {
         return maintenanceService.getMonthlyReport(mesinId, year, bulan);
     }
 
+    @GetMapping("/all-machines/year/{year}")
+    public List<MaintenanceSchedule> getAllSchedulesByYear(@PathVariable Integer year) {
+        return maintenanceService.getAllSchedulesByYear(year);
+    }
+
     @GetMapping("/mesin/by-number/{entityNo}")
     public Mesin getMesinByEntityNo(@PathVariable String entityNo) {
         return maintenanceService.findMesinByEntityNo(entityNo);
+    }
+
+    @GetMapping("/mesin")
+    public List<Mesin> getAllMesin() {
+        return maintenanceService.getAllMesin();
     }
 
     // Simpan jadwal baru atau reschedule

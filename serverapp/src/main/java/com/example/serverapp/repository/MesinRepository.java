@@ -7,5 +7,6 @@ import java.util.Optional;
 
 @Repository
 public interface MesinRepository extends JpaRepository<Mesin, Long> {
-    Optional<Mesin> findByEntityNo(String entityNo); // Tambahkan ini
+    Optional<Mesin> findByEntityNo(String entityNo);
+    
 }

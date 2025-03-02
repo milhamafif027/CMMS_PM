@@ -53,6 +53,42 @@
 }
 
 /* ==============================================
+   DROPDOWN STYLING
+   ============================================== */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--background-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: var(--transition);
+  background: #f8f9fa;
+  background-size: 12px;
+  cursor: pointer;
+}
+
+select:focus {
+  border-color: var(--secondary-color);
+  outline: none;
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+}
+
+select option {
+  padding: 10px;
+  background-color: white;
+  color: var(--text-color);
+}
+
+select option:hover {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+/* ==============================================
    FULLCALENDAR CUSTOMIZATION
    ============================================== */
 .fc {
@@ -312,6 +348,48 @@
 }
 
 /* ==============================================
+   Button Report 
+   ============================================== */
+/* Tombol Cetak Laporan Bulanan */
+.btn-report {
+  background: linear-gradient(145deg, #e95014, #e95014); /* Gradien biru */
+  color: white;
+  padding: 10px 16px; /* Ukuran padding sedang */
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem; /* Ukuran font sedang */
+  transition: all 0.3s ease-in-out;
+  border: none;
+  cursor: pointer;
+  width: auto; /* Lebar otomatis mengikuti konten */
+}
+
+/* Hover Effect */
+.btn-report:hover {
+  background: linear-gradient(145deg, #e44506, #e44506);
+  transform: translateY(-3px);
+  box-shadow: 0px 5px 15px rgba(208, 129, 26, 0.4);
+}
+
+/* Klik Aktif */
+.btn-report:active {
+  transform: translateY(0);
+}
+
+/* Posisi Tombol di Sebelah Kanan */
+#print-report {
+  margin-left: auto; /* Dorong tombol ke kanan */
+  margin-right: 35px; /* Geser ke kiri sebesar 20px dari sisi kanan */
+}
+
+.fc-day-disabled {
+  background-color: #f0f0f0 !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
+}
+
+
+/* ==============================================
    FORM TOGGLE STYLING
    ============================================== */
 #reschedule-form {
@@ -341,5 +419,11 @@
 
   .btn-save {
     padding: 10px 20px;
+  }
+
+  .btn-report {
+    font-size: 0.9rem;
+    padding: 10px 15px;
+    width: auto; /* Agar tidak terlalu besar di layar kecil */
   }
 }

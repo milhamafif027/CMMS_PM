@@ -1,279 +1,206 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Constants
   const API_BASE_URL = "http://localhost:8080/api";
-  const calendarEl = document.getElementById("calendar");
-  const modal = document.getElementById("event-modal");
-  const overlay = document.querySelector(".modal-overlay");
-  const saveButton = document.getElementById("save-event");
-  const closeBtn = document.getElementById("close-modal");
-  const scheduleForm = document.getElementById("schedule-form");
-  const rescheduleForm = document.getElementById("reschedule-form");
-  const scheduleTypeRadios = document.querySelectorAll(
-    'input[name="schedule-type"]'
-  );
+
+  // DOM Elements
+  const elements = {
+    calendar: document.getElementById("calendar"),
+    modal: document.getElementById("event-modal"),
+    overlay: document.querySelector(".modal-overlay"),
+    saveButton: document.getElementById("save-event"),
+    closeBtn: document.getElementById("close-modal"),
+    scheduleForm: document.getElementById("schedule-form"),
+    rescheduleForm: document.getElementById("reschedule-form"),
+    scheduleTypeRadios: document.querySelectorAll(
+      'input[name="schedule-type"]'
+    ),
+    entityNumber: document.getElementById("entity-number"),
+    entityName: document.getElementById("entity-name"),
+    mesinId: document.getElementById("mesin-id"),
+    rescheduleEntityNumber: document.getElementById("reschedule-entity-number"),
+    rescheduleEntityName: document.getElementById("reschedule-entity-name"),
+    rescheduleId: document.getElementById("reschedule-mesin-id"),
+    printReportButton: document.getElementById("print-report"),
+  };
+
+  // State
   let selectedDate = null;
 
-  // Inisialisasi kalender
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
-    headerToolbar: {
-      left: "prev,next today",
-      center: "title",
-      right: "dayGridMonth,timeGridWeek,timeGridDay",
-    },
-    selectable: true,
-    dateClick: function (info) {
-      selectedDate = info.dateStr;
-      openModal();
-    },
-    eventClick: function (info) {
-      alert(`
-        Entitas: ${info.event.extendedProps.entityName}
-        Jenis: ${info.event.extendedProps.action}
-        Teknisi: ${info.event.extendedProps.technician}
-        Deskripsi: ${info.event.extendedProps.description}
-      `);
-    },
-    events: async function (fetchInfo, successCallback, failureCallback) {
-      try {
-        // Menggunakan endpoint yang benar dan menambahkan parameter mesinId dan year
-        const mesinId = 2; // Ganti dengan ID mesin yang sesuai atau ambil dari selector
-        const year = fetchInfo.start.getFullYear();
+  // Month Helpers
+  const months = {
+    Januari: "01",
+    Februari: "02",
+    Maret: "03",
+    April: "04",
+    Mei: "05",
+    Juni: "06",
+    Juli: "07",
+    Agustus: "08",
+    September: "09",
+    Oktober: "10",
+    November: "11",
+    Desember: "12",
+  };
 
-        const response = await fetch(
-          `${API_BASE_URL}/maintenance/mesin/${mesinId}/year/${year}`
-        );
-        const data = await response.json();
+  const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
 
-        // Pastikan data adalah array sebelum menggunakan map
-        if (!Array.isArray(data)) {
-          console.error("Data bukan array:", data);
-          successCallback([]);
-          return;
-        }
-
-        const events = data.map((event) => ({
-          id: event.id,
-          title: `${event.mesin.entityName} - ${event.action}`,
-          start: `${event.tahun}-${getMonthNumber(event.bulan)}-${
-            event.tanggal
-          }`,
-          allDay: true,
-          extendedProps: {
-            entityNo: event.mesin.entityNo,
-            entityName: event.mesin.entityName,
-            action: event.action,
-            description: event.description,
-            technician: event.technician,
-            isRescheduled: event.isRescheduled,
-            rescheduleReason: event.rescheduleReason,
-            status: event.status,
-          },
-          backgroundColor: event.isRescheduled ? "#e74c3c" : "#2ecc71",
-        }));
-        successCallback(events);
-      } catch (error) {
-        console.error("Error fetching events:", error);
-        failureCallback(error);
-      }
-    },
-  });
-
-  // Helper function untuk konversi nama bulan ke angka
+  // Helper Functions
   function getMonthNumber(monthName) {
-    const months = {
-      Januari: "01",
-      Februari: "02",
-      Maret: "03",
-      April: "04",
-      Mei: "05",
-      Juni: "06",
-      Juli: "07",
-      Agustus: "08",
-      September: "09",
-      Oktober: "10",
-      November: "11",
-      Desember: "12",
-    };
     return months[monthName] || "01";
   }
 
-  // Helper function untuk konversi angka bulan ke nama bulan
   function getMonthName(monthNumber) {
-    const monthNames = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember",
-    ];
     return monthNames[monthNumber - 1] || "Januari";
   }
 
-  calendar.render();
-
-  // Fungsi untuk membuka modal
-  function openModal() {
-    modal.style.display = "block";
-    overlay.style.display = "block";
+  function parseDateParts(dateStr) {
+    const dateParts = dateStr.split("-");
+    return {
+      year: parseInt(dateParts[0]),
+      month: parseInt(dateParts[1]),
+      day: parseInt(dateParts[2]),
+      monthName: getMonthName(parseInt(dateParts[1])),
+    };
   }
 
-  // Fungsi untuk menutup modal
+  function isTodayDate(date) {
+    const today = new Date();
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  }
+
+  // Modal Functions
+  function openModal() {
+    const selectedDateObj = new Date(selectedDate);
+    if (isTodayDate(selectedDateObj)) {
+      elements.modal.style.display = "block";
+      elements.overlay.style.display = "block";
+    } else {
+      alert("Anda hanya dapat menjadwalkan maintenance untuk hari ini.");
+    }
+  }
+
   function closeModal() {
-    modal.style.display = "none";
-    overlay.style.display = "none";
+    elements.modal.style.display = "none";
+    elements.overlay.style.display = "none";
     resetForm();
   }
 
-  // Fungsi untuk mereset form
   function resetForm() {
-    document.getElementById("entity-number").value = "";
-    document.getElementById("entity-name").value = "";
-    document.getElementById("maintenance-type").value = "";
-    document.getElementById("description").value = "";
-    document.getElementById("technician").value = "";
-    document.getElementById("reschedule-entity-number").value = "";
-    document.getElementById("reschedule-entity-name").value = "";
-    document.getElementById("reschedule-reason").value = "";
-    document.getElementById("reschedule-maintenance-type").value = "";
-    document.getElementById("reschedule-technician").value = "";
+    const formElements = [
+      "entity-number",
+      "entity-name",
+      "maintenance-type",
+      "description",
+      "technician",
+      "reschedule-entity-number",
+      "reschedule-entity-name",
+      "reschedule-reason",
+      "reschedule-maintenance-type",
+      "reschedule-technician",
+    ];
+
+    formElements.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) element.value = "";
+    });
   }
 
-  // Toggle form berdasarkan pilihan Schedule atau Reschedule
-  scheduleTypeRadios.forEach((radio) => {
-    radio.addEventListener("change", (e) => {
-      if (e.target.value === "schedule") {
-        scheduleForm.style.display = "block";
-        rescheduleForm.style.display = "none";
-      } else {
-        scheduleForm.style.display = "none";
-        rescheduleForm.style.display = "block";
-      }
-    });
-  });
-
-  // Fungsi untuk mengisi nama entitas secara otomatis
-  document
-    .getElementById("entity-number")
-    .addEventListener("input", async (e) => {
-      const entityNo = e.target.value;
-      if (entityNo) {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/maintenance/mesin/by-number/${entityNo}`
-          );
-          if (!response.ok) {
-            throw new Error("Mesin tidak ditemukan");
-          }
-          const mesin = await response.json();
-          document.getElementById("entity-name").value = mesin.entityName;
-          document.getElementById("mesin-id").value = mesin.id;
-        } catch (error) {
-          console.error("Error fetching mesin:", error);
-          document.getElementById("entity-name").value = "";
-          document.getElementById("mesin-id").value = "";
-          alert("Mesin tidak ditemukan. Pastikan nomor entitas benar.");
-        }
-      } else {
-        document.getElementById("entity-name").value = "";
-        document.getElementById("mesin-id").value = "";
-      }
-    });
-
-  document
-    .getElementById("reschedule-entity-number")
-    .addEventListener("input", async (e) => {
-      const entityNo = e.target.value;
-      if (entityNo) {
-        try {
-          const response = await fetch(
-            `${API_BASE_URL}/maintenance/mesin/by-number/${entityNo}`
-          );
-          if (!response.ok) {
-            throw new Error("Mesin tidak ditemukan");
-          }
-          const mesin = await response.json();
-          document.getElementById("reschedule-entity-name").value =
-            mesin.entityName;
-          document.getElementById("reschedule-mesin-id").value = mesin.id;
-        } catch (error) {
-          console.error("Error fetching mesin:", error);
-          document.getElementById("reschedule-entity-name").value = "";
-          document.getElementById("reschedule-mesin-id").value = "";
-        }
-      } else {
-        document.getElementById("reschedule-entity-name").value = "";
-        document.getElementById("reschedule-mesin-id").value = "";
-      }
-    });
-
-  // Fungsi menyimpan event
-  async function handleSaveEvent() {
-    const selectedType = document.querySelector(
-      'input[name="schedule-type"]:checked'
-    ).value;
-
+  // API Functions
+  async function fetchMesinByNumber(entityNo) {
     try {
-      if (selectedType === "schedule") {
-        // Logika untuk Schedule
-        const mesinId = document.getElementById("mesin-id").value;
-        const entityNo = document.getElementById("entity-number").value;
+      const response = await fetch(
+        `${API_BASE_URL}/maintenance/mesin/by-number/${entityNo}`
+      );
+      if (!response.ok) throw new Error("Mesin tidak ditemukan");
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching mesin:", error);
+      return null;
+    }
+  }
+
+  async function populateMesinDropdown() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/mesin`);
+      if (!response.ok) throw new Error("Gagal mengambil data mesin");
+      const mesinList = await response.json();
+
+      const dropdowns = [
+        elements.entityNumber,
+        elements.rescheduleEntityNumber,
+      ];
+
+      dropdowns.forEach((dropdown) => {
+        if (!dropdown) return;
+
+        dropdown.innerHTML = "";
+        const defaultOption = document.createElement("option");
+        defaultOption.value = "";
+        defaultOption.text = "Pilih Nomor Entitas";
+        dropdown.appendChild(defaultOption);
+
+        mesinList.forEach((mesin) => {
+          const option = document.createElement("option");
+          option.value = mesin.entityNo;
+          option.text = `${mesin.entityNo} - ${mesin.entityName}`;
+          dropdown.appendChild(option);
+        });
+      });
+    } catch (error) {
+      console.error("Error fetching mesin list:", error);
+    }
+  }
+
+  async function saveSchedule(isReschedule) {
+    try {
+      const dateInfo = parseDateParts(selectedDate);
+      const commonData = {
+        bulan: dateInfo.monthName,
+        tanggal: dateInfo.day,
+        tahun: dateInfo.year,
+        isRescheduled: isReschedule,
+      };
+
+      let specificData;
+
+      if (!isReschedule) {
+        const mesinId = elements.mesinId.value;
         const maintenanceType =
           document.getElementById("maintenance-type").value;
         const description = document.getElementById("description").value;
         const technician = document.getElementById("technician").value;
 
-        if (!entityNo || !maintenanceType || !technician) {
-          alert("Semua field harus diisi!");
-          return;
+        if (!elements.entityNumber.value || !maintenanceType || !technician) {
+          throw new Error("Semua field harus diisi!");
         }
 
-        // Ekstrak tahun, bulan, dan tanggal dari selectedDate
-        const dateParts = selectedDate.split("-");
-        const year = parseInt(dateParts[0]);
-        const month = parseInt(dateParts[1]);
-        const day = parseInt(dateParts[2]);
-
-        // Konversi angka bulan ke nama bulan
-        const monthName = getMonthName(month);
-
-        const response = await fetch(`${API_BASE_URL}/maintenance`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            mesin: {
-              id: mesinId,
-            },
-            bulan: monthName,
-            tanggal: day,
-            tahun: year,
-            status: "Scheduled",
-            action: maintenanceType,
-            description: description,
-            technician: technician,
-            isRescheduled: false,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Gagal menyimpan jadwal");
-        }
-
-        calendar.refetchEvents(); // Refresh kalender
+        specificData = {
+          mesin: { id: mesinId },
+          status: "Scheduled",
+          action: maintenanceType,
+          description: description || "-",
+          technician: technician,
+          rescheduleReason: null,
+        };
       } else {
-        // Logika untuk Reschedule
-        const mesinId = document.getElementById("reschedule-mesin-id").value;
-        const entityNo = document.getElementById(
-          "reschedule-entity-number"
-        ).value;
+        const mesinId = elements.rescheduleId.value;
         const reason = document.getElementById("reschedule-reason").value;
         const maintenanceType = document.getElementById(
           "reschedule-maintenance-type"
@@ -282,57 +209,308 @@ document.addEventListener("DOMContentLoaded", function () {
           "reschedule-technician"
         ).value;
 
-        if (!entityNo || !reason || !maintenanceType || !technician) {
-          alert("Semua field harus diisi!");
-          return;
+        if (
+          !elements.rescheduleEntityNumber.value ||
+          !reason ||
+          !maintenanceType ||
+          !technician
+        ) {
+          throw new Error("Semua field harus diisi!");
         }
 
-        // Ekstrak tahun, bulan, dan tanggal dari selectedDate
-        const dateParts = selectedDate.split("-");
-        const year = parseInt(dateParts[0]);
-        const month = parseInt(dateParts[1]);
-        const day = parseInt(dateParts[2]);
-
-        // Konversi angka bulan ke nama bulan
-        const monthName = getMonthName(month);
-
-        const response = await fetch(`${API_BASE_URL}/maintenance`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            mesin: {
-              id: mesinId,
-            },
-            bulan: monthName,
-            tanggal: day,
-            tahun: year,
-            status: "Rescheduled",
-            action: maintenanceType,
-            description: reason,
-            technician: technician,
-            isRescheduled: true,
-            rescheduleReason: reason,
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Gagal menyimpan reschedule");
-        }
-
-        calendar.refetchEvents(); // Refresh kalender
+        specificData = {
+          mesin: { id: mesinId },
+          status: "Rescheduled",
+          action: maintenanceType,
+          description: reason,
+          technician: technician,
+          rescheduleReason: reason,
+        };
       }
 
-      closeModal();
+      const requestData = { ...commonData, ...specificData };
+      console.log("Data yang akan disimpan:", requestData);
+
+      const response = await fetch(`${API_BASE_URL}/maintenance`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error:", errorText);
+        throw new Error(
+          `Gagal menyimpan ${isReschedule ? "reschedule" : "jadwal"}`
+        );
+      }
+
+      alert("Jadwal berhasil disimpan!");
+      return true;
     } catch (error) {
-      console.error("Error saving event:", error);
+      console.error("Save error:", error);
       alert(error.message || "Terjadi kesalahan saat menyimpan data.");
+      return false;
     }
   }
 
-  // Event Listeners
-  saveButton.addEventListener("click", handleSaveEvent);
-  overlay.addEventListener("click", closeModal);
-  closeBtn.addEventListener("click", closeModal);
+  // Calendar Configuration
+  const calendar = new FullCalendar.Calendar(elements.calendar, {
+    initialView: "dayGridMonth",
+    headerToolbar: {
+      left: "prev,next today",
+      center: "title",
+      right: "dayGridMonth,timeGridWeek,timeGridDay",
+    },
+    dayMaxEvents: false,
+    eventDisplay: "block",
+    eventTextColor: "#FFFFFF",
+    selectable: true,
+    dateClick: function (info) {
+      if (isTodayDate(info.date)) {
+        selectedDate = info.dateStr;
+        openModal();
+      } else {
+        alert("Anda hanya dapat menjadwalkan maintenance untuk hari ini.");
+      }
+    },
+    dayCellClassNames: function (arg) {
+      if (!isTodayDate(arg.date)) {
+        return ["fc-day-disabled"];
+      }
+      return [];
+    },
+    eventClick: function (info) {
+      const event = info.event;
+      const props = event.extendedProps;
+      alert(`
+        Entitas: ${props.entityName}
+        Jenis: ${props.action}
+        Teknisi: ${props.technician}
+        Deskripsi: ${props.description || "-"}
+        Status: ${props.status}
+      `);
+    },
+    events: async function (fetchInfo, successCallback, failureCallback) {
+      try {
+        const year = fetchInfo.start.getFullYear();
+        console.log("Fetching events for year:", year);
+
+        const response = await fetch(
+          `${API_BASE_URL}/maintenance/all-machines/year/${year}`
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("API Error:", errorText);
+          throw new Error("Failed to fetch events");
+        }
+
+        const data = await response.json();
+        console.log("Events data from API:", data);
+
+        if (!Array.isArray(data)) {
+          console.error("API did not return an array:", data);
+          throw new Error("Invalid data format");
+        }
+
+        const events = data.map((event) => {
+          const monthNum = getMonthNumber(event.bulan);
+          const day = event.tanggal.toString().padStart(2, "0");
+          const dateStr = `${event.tahun}-${monthNum}-${day}`;
+
+          console.log(`Creating event for date: ${dateStr}`);
+
+          return {
+            id: event.id,
+            title: `${event.mesin.entityNo} - ${event.action}`,
+            start: dateStr,
+            allDay: true,
+            extendedProps: {
+              entityNo: event.mesin.entityNo,
+              entityName: event.mesin.entityName,
+              action: event.action,
+              description: event.description,
+              technician: event.technician,
+              isRescheduled: event.isRescheduled,
+              rescheduleReason: event.rescheduleReason,
+              status: event.status,
+            },
+            backgroundColor: event.isRescheduled ? "#e74c3c" : "#2ecc71",
+            borderColor: event.isRescheduled ? "#c0392b" : "#27ae60",
+          };
+        });
+
+        console.log("Processed events:", events);
+        successCallback(events);
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        failureCallback(error);
+      }
+    },
+  });
+
+  // Event Handlers
+  async function handleEntityNumberChange(
+    e,
+    targetNameField,
+    targetIdField,
+    isReschedule = false
+  ) {
+    const entityNo = e.target.value;
+    console.log("handleEntityNumberChange called with entityNo:", entityNo);
+
+    if (entityNo) {
+      try {
+        const mesin = await fetchMesinByNumber(entityNo);
+        if (mesin) {
+          console.log("Mesin found:", mesin);
+          document.getElementById(targetNameField).value = mesin.entityName;
+          document.getElementById(targetIdField).value = mesin.id;
+        } else {
+          throw new Error("Mesin tidak ditemukan");
+        }
+      } catch (error) {
+        console.error("Error in handleEntityNumberChange:", error);
+        document.getElementById(targetNameField).value = "";
+        document.getElementById(targetIdField).value = "";
+        if (!isReschedule) {
+          alert("Mesin tidak ditemukan. Pastikan nomor entitas benar.");
+        }
+      }
+    } else {
+      document.getElementById(targetNameField).value = "";
+      document.getElementById(targetIdField).value = "";
+    }
+  }
+
+  async function handleSaveEvent() {
+    const isReschedule =
+      document.querySelector('input[name="schedule-type"]:checked').value ===
+      "reschedule";
+    console.log("Saving event, isReschedule:", isReschedule);
+
+    const success = await saveSchedule(isReschedule);
+
+    if (success) {
+      console.log("Event saved successfully, refreshing calendar");
+      calendar.refetchEvents();
+      closeModal();
+    }
+  }
+
+  function handleScheduleTypeChange(e) {
+    const isReschedule = e.target.value === "reschedule";
+    elements.scheduleForm.style.display = isReschedule ? "none" : "block";
+    elements.rescheduleForm.style.display = isReschedule ? "block" : "none";
+  }
+
+  elements.printReportButton.addEventListener("click", async function () {
+    try {
+      const currentDate = calendar.getDate();
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+
+      console.log(`Generating report for ${month}/${year}`);
+
+      const response = await fetch(
+        `${API_BASE_URL}/maintenance/report/monthly?year=${year}&month=${month}`
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API Error:", errorText);
+        throw new Error("Gagal mengambil laporan bulanan");
+      }
+
+      const data = await response.json();
+      console.log("Report data:", data);
+
+      const printContent = `
+        <h1>Laporan Pemeliharaan Bulanan</h1>
+        <h2>Bulan: ${getMonthName(month)} ${year}</h2>
+        <table border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Tanggal</th>
+              <th>Nomor Entitas</th>
+              <th>Nama Entitas</th>
+              <th>Jenis Pemeliharaan</th>
+              <th>Teknisi</th>
+              <th>Status</th>
+              <th>Deskripsi</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data
+              .map(
+                (item, index) => `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${item.tanggal}</td>
+                <td>${item.mesin.entityNo}</td>
+                <td>${item.mesin.entityName}</td>
+                <td>${item.action}</td>
+                <td>${item.technician}</td>
+                <td>${item.status}</td>
+                <td>${item.description || "-"}</td>
+              </tr>
+            `
+              )
+              .join("")}
+          </tbody>
+        </table>
+      `;
+
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Laporan Pemeliharaan Bulanan</title>
+            <style>
+              body { font-family: Arial, sans-serif; }
+              table { width: 100%; border-collapse: collapse; }
+              th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+              th { background-color: #f2f2f2; }
+            </style>
+          </head>
+          <body>
+            ${printContent}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    } catch (error) {
+      console.error("Error generating report:", error);
+      alert("Gagal mencetak laporan. Silakan coba lagi.");
+    }
+  });
+
+  // Set up event listeners
+  elements.scheduleTypeRadios.forEach((radio) => {
+    radio.addEventListener("change", handleScheduleTypeChange);
+  });
+
+  elements.entityNumber.addEventListener("change", (e) => {
+    handleEntityNumberChange(e, "entity-name", "mesin-id");
+  });
+
+  elements.rescheduleEntityNumber.addEventListener("change", (e) => {
+    handleEntityNumberChange(
+      e,
+      "reschedule-entity-name",
+      "reschedule-mesin-id",
+      true
+    );
+  });
+
+  elements.saveButton.addEventListener("click", handleSaveEvent);
+  elements.overlay.addEventListener("click", closeModal);
+  elements.closeBtn.addEventListener("click", closeModal);
+
+  // Initialize
+  calendar.render();
+  populateMesinDropdown();
 });
