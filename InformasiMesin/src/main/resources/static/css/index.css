@@ -245,6 +245,35 @@ tbody tr:hover {
   visibility: visible;
 }
 
+/* ================================================ 
+   MODAL DETAIL STYLING
+   ================================================ */
+#detail-modal .modal-content {
+  padding: 25px;
+}
+
+.detail-group {
+  margin-bottom: 20px;
+}
+
+.detail-group label {
+  display: block;
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.detail-group .detail-text {
+  font-size: 1rem;
+  color: #333;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin: 0;
+}
+
 /* Modal Header */
 .modal-header {
   display: flex;

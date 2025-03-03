@@ -11,9 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     closeBtn: document.getElementById("close-modal"),
     scheduleForm: document.getElementById("schedule-form"),
     rescheduleForm: document.getElementById("reschedule-form"),
-    scheduleTypeRadios: document.querySelectorAll(
-      'input[name="schedule-type"]'
-    ),
+    scheduleTypeRadios: document.querySelectorAll('input[name="schedule-type"]'),
     entityNumber: document.getElementById("entity-number"),
     entityName: document.getElementById("entity-name"),
     mesinId: document.getElementById("mesin-id"),
@@ -28,33 +26,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Month Helpers
   const months = {
-    Januari: "01",
-    Februari: "02",
-    Maret: "03",
-    April: "04",
-    Mei: "05",
-    Juni: "06",
-    Juli: "07",
-    Agustus: "08",
-    September: "09",
-    Oktober: "10",
-    November: "11",
-    Desember: "12",
+    Januari: "01", Februari: "02", Maret: "03", April: "04", Mei: "05", Juni: "06",
+    Juli: "07", Agustus: "08", September: "09", Oktober: "10", November: "11", Desember: "12",
   };
 
   const monthNames = [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-    "November",
-    "Desember",
+    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
   ];
 
   // Helper Functions
@@ -78,11 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function isTodayDate(date) {
     const today = new Date();
-    return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
-    );
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
   }
 
   // Modal Functions
@@ -104,16 +80,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function resetForm() {
     const formElements = [
-      "entity-number",
-      "entity-name",
-      "maintenance-type",
-      "description",
-      "technician",
-      "reschedule-entity-number",
-      "reschedule-entity-name",
-      "reschedule-reason",
-      "reschedule-maintenance-type",
-      "reschedule-technician",
+      "entity-number", "entity-name", "maintenance-type", "description", "technician",
+      "reschedule-entity-number", "reschedule-entity-name", "reschedule-reason",
+      "reschedule-maintenance-type", "reschedule-technician",
     ];
 
     formElements.forEach((id) => {
@@ -125,11 +94,12 @@ document.addEventListener("DOMContentLoaded", function () {
   // API Functions
   async function fetchMesinByNumber(entityNo) {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/maintenance/mesin/by-number/${entityNo}`
-      );
+      console.log("Fetching Mesin Data:", entityNo);
+      const response = await fetch(`${API_BASE_URL}/maintenance/mesin/by-number/${entityNo}`);
       if (!response.ok) throw new Error("Mesin tidak ditemukan");
-      return await response.json();
+      const data = await response.json();
+      console.log("Mesin data received:", data);
+      return data;
     } catch (error) {
       console.error("Error fetching mesin:", error);
       return null;
@@ -142,14 +112,14 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!response.ok) throw new Error("Gagal mengambil data mesin");
       const mesinList = await response.json();
 
-      const dropdowns = [
-        elements.entityNumber,
-        elements.rescheduleEntityNumber,
-      ];
+      const dropdowns = [elements.entityNumber, elements.rescheduleEntityNumber];
 
       dropdowns.forEach((dropdown) => {
-        if (!dropdown) return;
-
+        if (!dropdown) {
+          console.error("Dropdown element not found");
+          return;
+        }
+        
         dropdown.innerHTML = "";
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
@@ -181,13 +151,12 @@ document.addEventListener("DOMContentLoaded", function () {
       let specificData;
 
       if (!isReschedule) {
-        const mesinId = elements.mesinId.value;
-        const maintenanceType =
-          document.getElementById("maintenance-type").value;
-        const description = document.getElementById("description").value;
-        const technician = document.getElementById("technician").value;
+        const mesinId = elements.mesinId?.value;
+        const maintenanceType = document.getElementById("maintenance-type")?.value;
+        const description = document.getElementById("description")?.value;
+        const technician = document.getElementById("technician")?.value;
 
-        if (!elements.entityNumber.value || !maintenanceType || !technician) {
+        if (!elements.entityNumber?.value || !maintenanceType || !technician) {
           throw new Error("Semua field harus diisi!");
         }
 
@@ -200,21 +169,12 @@ document.addEventListener("DOMContentLoaded", function () {
           rescheduleReason: null,
         };
       } else {
-        const mesinId = elements.rescheduleId.value;
-        const reason = document.getElementById("reschedule-reason").value;
-        const maintenanceType = document.getElementById(
-          "reschedule-maintenance-type"
-        ).value;
-        const technician = document.getElementById(
-          "reschedule-technician"
-        ).value;
+        const mesinId = elements.rescheduleId?.value;
+        const reason = document.getElementById("reschedule-reason")?.value;
+        const maintenanceType = document.getElementById("reschedule-maintenance-type")?.value;
+        const technician = document.getElementById("reschedule-technician")?.value;
 
-        if (
-          !elements.rescheduleEntityNumber.value ||
-          !reason ||
-          !maintenanceType ||
-          !technician
-        ) {
+        if (!elements.rescheduleEntityNumber?.value || !reason || !maintenanceType || !technician) {
           throw new Error("Semua field harus diisi!");
         }
 
@@ -240,9 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error:", errorText);
-        throw new Error(
-          `Gagal menyimpan ${isReschedule ? "reschedule" : "jadwal"}`
-        );
+        throw new Error(`Gagal menyimpan ${isReschedule ? "reschedule" : "jadwal"}`);
       }
 
       alert("Jadwal berhasil disimpan!");
@@ -296,16 +254,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const year = fetchInfo.start.getFullYear();
         console.log("Fetching events for year:", year);
 
-        const response = await fetch(
-          `${API_BASE_URL}/maintenance/all-machines/year/${year}`
-        );
-
+        const response = await fetch(`${API_BASE_URL}/maintenance/all-machines/year/${year}`);
+        
         if (!response.ok) {
           const errorText = await response.text();
           console.error("API Error:", errorText);
           throw new Error("Failed to fetch events");
         }
-
+        
         const data = await response.json();
         console.log("Events data from API:", data);
 
@@ -316,11 +272,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const events = data.map((event) => {
           const monthNum = getMonthNumber(event.bulan);
-          const day = event.tanggal.toString().padStart(2, "0");
+          const day = event.tanggal.toString().padStart(2, '0');
           const dateStr = `${event.tahun}-${monthNum}-${day}`;
-
+          
           console.log(`Creating event for date: ${dateStr}`);
-
+          
           return {
             id: event.id,
             title: `${event.mesin.entityNo} - ${event.action}`,
@@ -351,45 +307,47 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Event Handlers
-  async function handleEntityNumberChange(
-    e,
-    targetNameField,
-    targetIdField,
-    isReschedule = false
-  ) {
+  async function handleEntityNumberChange(e, targetNameField, targetIdField, isReschedule = false) {
     const entityNo = e.target.value;
     console.log("handleEntityNumberChange called with entityNo:", entityNo);
+    console.log(`Target Name Field: ${targetNameField}, Target ID Field: ${targetIdField}`);
+
+    const targetNameElement = document.getElementById(targetNameField);
+    const targetIdElement = document.getElementById(targetIdField);
+
+    if (!targetNameElement || !targetIdElement) {
+      console.error(`Error: Element with ID ${targetNameField} or ${targetIdField} not found.`);
+      return;
+    }
 
     if (entityNo) {
       try {
         const mesin = await fetchMesinByNumber(entityNo);
         if (mesin) {
           console.log("Mesin found:", mesin);
-          document.getElementById(targetNameField).value = mesin.entityName;
-          document.getElementById(targetIdField).value = mesin.id;
+          targetNameElement.value = mesin.entityName;
+          targetIdElement.value = mesin.id;
         } else {
           throw new Error("Mesin tidak ditemukan");
         }
       } catch (error) {
         console.error("Error in handleEntityNumberChange:", error);
-        document.getElementById(targetNameField).value = "";
-        document.getElementById(targetIdField).value = "";
+        targetNameElement.value = "";
+        targetIdElement.value = "";
         if (!isReschedule) {
           alert("Mesin tidak ditemukan. Pastikan nomor entitas benar.");
         }
       }
     } else {
-      document.getElementById(targetNameField).value = "";
-      document.getElementById(targetIdField).value = "";
+      targetNameElement.value = "";
+      targetIdElement.value = "";
     }
   }
 
   async function handleSaveEvent() {
-    const isReschedule =
-      document.querySelector('input[name="schedule-type"]:checked').value ===
-      "reschedule";
+    const isReschedule = document.querySelector('input[name="schedule-type"]:checked').value === "reschedule";
     console.log("Saving event, isReschedule:", isReschedule);
-
+    
     const success = await saveSchedule(isReschedule);
 
     if (success) {
@@ -413,16 +371,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       console.log(`Generating report for ${month}/${year}`);
 
-      const response = await fetch(
-        `${API_BASE_URL}/maintenance/report/monthly?year=${year}&month=${month}`
-      );
-
+      const response = await fetch(`${API_BASE_URL}/maintenance/report/monthly?year=${year}&month=${month}`);
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error("API Error:", errorText);
         throw new Error("Gagal mengambil laporan bulanan");
       }
-
+      
       const data = await response.json();
       console.log("Report data:", data);
 
@@ -443,9 +399,8 @@ document.addEventListener("DOMContentLoaded", function () {
             </tr>
           </thead>
           <tbody>
-            ${data
-              .map(
-                (item, index) => `
+          <tbody>
+            ${data.map((item, index) => `
               <tr>
                 <td>${index + 1}</td>
                 <td>${item.tanggal}</td>
@@ -456,9 +411,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td>${item.status}</td>
                 <td>${item.description || "-"}</td>
               </tr>
-            `
-              )
-              .join("")}
+            `).join("")}
           </tbody>
         </table>
       `;
@@ -514,3 +467,6 @@ document.addEventListener("DOMContentLoaded", function () {
   calendar.render();
   populateMesinDropdown();
 });
+
+              
+              
