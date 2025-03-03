@@ -388,6 +388,28 @@ select option:hover {
   cursor: not-allowed !important;
 }
 
+/* CSS untuk event reschedule */
+.reschedule-event {
+  background-color: #e74c3c !important; /* Warna merah */
+  border-color: #c0392b !important; /* Warna border merah */
+  color: white !important; /* Warna teks putih */
+}
+
+/* CSS untuk event regular */
+.regular-event {
+  background-color: #2ecc71 !important; /* Warna hijau */
+  border-color: #27ae60 !important; /* Warna border hijau */
+  color: white !important; /* Warna teks putih */
+}
+
+/* CSS default FullCalendar */
+.fc-daygrid-event {
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+}
+
+
+
 
 /* ==============================================
    FORM TOGGLE STYLING
