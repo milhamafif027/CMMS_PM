@@ -192,13 +192,13 @@ tbody tr:hover {
 }
 
 .btn-view {
-  background-color: #08b813;
+  background-color: #2b9732;
   color: white;
   box-shadow: 0 2px 8px rgba(8, 184, 19, 0.3);
 }
 
 .btn-view:hover {
-  background-color: #1ef42c;
+  background-color: #2ebe38;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(8, 184, 19, 0.4);
 }
