@@ -15,12 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/maintenance")
 @CrossOrigin(origins = "*")
-public class MaintenanceController {
+public class MaintenanceScheduleController {
 
     private final MaintenanceScheduleService maintenanceService;
     private final PdfGenerationService pdfGenerationService;
 
-    public MaintenanceController(MaintenanceScheduleService maintenanceService, PdfGenerationService pdfGenerationService) {
+    public MaintenanceScheduleController(MaintenanceScheduleService maintenanceService, PdfGenerationService pdfGenerationService) {
         this.maintenanceService = maintenanceService;
         this.pdfGenerationService = pdfGenerationService;
     }
