@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
 
-@Data
 @Entity
+@Data
 @Table(name = "mesin")
 public class Mesin {
     @Id

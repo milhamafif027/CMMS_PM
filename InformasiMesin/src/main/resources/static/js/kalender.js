@@ -1,28 +1,14 @@
+/**
+ * @fileoverview Main application for maintenance scheduling system
+ * @version 1.0.0
+ * @description Handles calendar display, maintenance scheduling, and reporting
+ */
+
 document.addEventListener("DOMContentLoaded", function () {
+  // ========================================================
+  // Configuration Constants
+  // ========================================================
   const API_BASE_URL = "http://localhost:8080/api";
-
-  const elements = {
-    calendar: document.getElementById("calendar"),
-    modal: document.getElementById("event-modal"),
-    overlay: document.querySelector(".modal-overlay"),
-    saveButton: document.getElementById("save-event"),
-    closeBtn: document.getElementById("close-modal"),
-    scheduleForm: document.getElementById("schedule-form"),
-    rescheduleForm: document.getElementById("reschedule-form"),
-    scheduleTypeRadios: document.querySelectorAll(
-      'input[name="schedule-type"]'
-    ),
-    entityNumber: document.getElementById("entity-number"),
-    entityName: document.getElementById("entity-name"),
-    mesinId: document.getElementById("mesin-id"),
-    rescheduleEntityNumber: document.getElementById("reschedule-entity-number"),
-    rescheduleEntityName: document.getElementById("reschedule-entity-name"),
-    rescheduleId: document.getElementById("reschedule-mesin-id"),
-    printReportButton: document.getElementById("print-report"),
-  };
-
-  let selectedDate = null;
-
   const months = {
     Januari: "01",
     Februari: "02",
@@ -37,30 +23,53 @@ document.addEventListener("DOMContentLoaded", function () {
     November: "11",
     Desember: "12",
   };
+  const monthNames = Object.keys(months);
 
-  const monthNames = [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-    "November",
-    "Desember",
-  ];
+  // ========================================================
+  // DOM Elements
+  // ========================================================
+  const elements = {
+    calendar: document.getElementById("calendar"),
+    modal: document.getElementById("event-modal"),
+    overlay: document.querySelector(".modal-overlay"),
+    saveButton: document.getElementById("save-event"),
+    closeBtn: document.getElementById("close-modal"),
+    rescheduleForm: document.getElementById("reschedule-form"),
+    rescheduleEntityNumber: document.getElementById("reschedule-entity-number"),
+    rescheduleEntityName: document.getElementById("reschedule-entity-name"),
+    rescheduleId: document.getElementById("reschedule-mesin-id"),
+    printReportButton: document.getElementById("print-report"),
+  };
 
+  let selectedDate = null;
+
+  // ========================================================
+  // Utility Functions
+  // ========================================================
+
+  /**
+   * Gets month number from month name
+   * @param {string} monthName
+   * @returns {string} Two-digit month number
+   */
   function getMonthNumber(monthName) {
     return months[monthName] || "01";
   }
 
+  /**
+   * Gets month name from month number (1-12)
+   * @param {number} monthNumber
+   * @returns {string} Month name
+   */
   function getMonthName(monthNumber) {
     return monthNames[monthNumber - 1] || "Januari";
   }
 
+  /**
+   * Parses date string into components
+   * @param {string} dateStr - Format YYYY-MM-DD
+   * @returns {Object} Parsed date components
+   */
   function parseDateParts(dateStr) {
     const dateParts = dateStr.split("-");
     return {
@@ -71,6 +80,11 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
+  /**
+   * Checks if date is today
+   * @param {Date} date
+   * @returns {boolean}
+   */
   function isTodayDate(date) {
     const today = new Date();
     return (
@@ -80,14 +94,13 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
+  // ========================================================
+  // Modal Management
+  // ========================================================
+
   function openModal() {
-    const selectedDateObj = new Date(selectedDate);
-    if (isTodayDate(selectedDateObj)) {
-      elements.modal.style.display = "block";
-      elements.overlay.style.display = "block";
-    } else {
-      alert("Anda hanya dapat menjadwalkan maintenance untuk hari ini.");
-    }
+    elements.modal.style.display = "block";
+    elements.overlay.style.display = "block";
   }
 
   function closeModal() {
@@ -97,25 +110,27 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function resetForm() {
-    const formElements = [
-      "entity-number",
-      "entity-name",
-      "maintenance-type",
-      "description",
-      "technician",
+    [
       "reschedule-entity-number",
       "reschedule-entity-name",
       "reschedule-reason",
       "reschedule-maintenance-type",
       "reschedule-technician",
-    ];
-
-    formElements.forEach((id) => {
+    ].forEach((id) => {
       const element = document.getElementById(id);
       if (element) element.value = "";
     });
   }
 
+  // ========================================================
+  // API Interaction Functions
+  // ========================================================
+
+  /**
+   * Fetches machine by entity number
+   * @param {string} entityNo
+   * @returns {Promise<Object|null>} Machine data
+   */
   async function fetchMesinByNumber(entityNo) {
     try {
       const response = await fetch(
@@ -129,101 +144,61 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  /**
+   * Populates machine dropdown
+   */
   async function populateMesinDropdown() {
     try {
       const response = await fetch(`${API_BASE_URL}/mesin`);
       if (!response.ok) throw new Error("Gagal mengambil data mesin");
       const mesinList = await response.json();
 
-      const dropdowns = [
-        elements.entityNumber,
-        elements.rescheduleEntityNumber,
-      ];
+      const dropdown = elements.rescheduleEntityNumber;
+      if (!dropdown) return;
 
-      dropdowns.forEach((dropdown) => {
-        if (!dropdown) {
-          console.error("Dropdown element not found");
-          return;
-        }
-        dropdown.innerHTML = "";
-        const defaultOption = document.createElement("option");
-        defaultOption.value = "";
-        defaultOption.text = "Pilih Nomor Entitas";
-        dropdown.appendChild(defaultOption);
-
-        mesinList.forEach((mesin) => {
-          const option = document.createElement("option");
-          option.value = mesin.entityNo;
-          option.text = `${mesin.entityNo} - ${mesin.entityName}`;
-          dropdown.appendChild(option);
-        });
+      dropdown.innerHTML = '<option value="">Pilih Nomor Entitas</option>';
+      mesinList.forEach((mesin) => {
+        const option = document.createElement("option");
+        option.value = mesin.entityNo;
+        option.text = `${mesin.entityNo} - ${mesin.entityName}`;
+        dropdown.appendChild(option);
       });
     } catch (error) {
       console.error("Error fetching mesin list:", error);
     }
   }
 
-  async function saveSchedule(isReschedule) {
+  /**
+   * Saves maintenance schedule
+   * @returns {Promise<boolean>} Success status
+   */
+  async function saveSchedule() {
     try {
       const dateInfo = parseDateParts(selectedDate);
-      const commonData = {
+      const requiredFields = [
+        elements.rescheduleEntityNumber?.value,
+        document.getElementById("reschedule-reason")?.value,
+        document.getElementById("reschedule-maintenance-type")?.value,
+        document.getElementById("reschedule-technician")?.value,
+      ];
+
+      if (requiredFields.some((field) => !field)) {
+        throw new Error("Semua field harus diisi!");
+      }
+
+      const requestData = {
         bulan: dateInfo.monthName,
         tanggal: dateInfo.day,
         tahun: dateInfo.year,
-        isRescheduled: isReschedule,
+        isRescheduled: true,
+        mesin: { id: elements.rescheduleId?.value },
+        status: "Rescheduled",
+        action: document.getElementById("reschedule-maintenance-type")?.value,
+        description: document.getElementById("reschedule-reason")?.value,
+        technician: document.getElementById("reschedule-technician")?.value,
+        rescheduleReason: document.getElementById("reschedule-reason")?.value,
       };
 
-      let specificData;
-
-      if (!isReschedule) {
-        const mesinId = elements.mesinId?.value;
-        const maintenanceType =
-          document.getElementById("maintenance-type")?.value;
-        const description = document.getElementById("description")?.value;
-        const technician = document.getElementById("technician")?.value;
-
-        if (!elements.entityNumber?.value || !maintenanceType || !technician) {
-          throw new Error("Semua field harus diisi!");
-        }
-
-        specificData = {
-          mesin: { id: mesinId },
-          status: "Scheduled",
-          action: maintenanceType,
-          description: description || "-",
-          technician: technician,
-          rescheduleReason: null,
-        };
-      } else {
-        const mesinId = elements.rescheduleId?.value;
-        const reason = document.getElementById("reschedule-reason")?.value;
-        const maintenanceType = document.getElementById(
-          "reschedule-maintenance-type"
-        )?.value;
-        const technician = document.getElementById(
-          "reschedule-technician"
-        )?.value;
-
-        if (
-          !elements.rescheduleEntityNumber?.value ||
-          !reason ||
-          !maintenanceType ||
-          !technician
-        ) {
-          throw new Error("Semua field harus diisi!");
-        }
-
-        specificData = {
-          mesin: { id: mesinId },
-          status: "Rescheduled",
-          action: maintenanceType,
-          description: reason,
-          technician: technician,
-          rescheduleReason: reason,
-        };
-      }
-
-      const requestData = { ...commonData, ...specificData };
       const response = await fetch(`${API_BASE_URL}/maintenance`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -231,13 +206,10 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Gagal menyimpan ${isReschedule ? "reschedule" : "jadwal"}`
-        );
+        throw new Error("Gagal menyimpan reschedule");
       }
 
-      alert("Jadwal berhasil disimpan!");
+      alert("Reschedule berhasil disimpan!");
       return true;
     } catch (error) {
       console.error("Save error:", error);
@@ -246,6 +218,67 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  /**
+   * Saves automatic schedule for given month/year
+   * @param {number} year
+   * @param {number} month
+   */
+  async function saveAutomaticSchedule(year, month) {
+    try {
+      const key = `automaticSchedule-${year}-${month}`;
+      if (localStorage.getItem(key)) {
+        console.log("Jadwal sudah digenerate sebelumnya.");
+        return;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/maintenance/automatic-schedule?year=${year}&month=${month}`
+      );
+      if (!response.ok) {
+        throw new Error("Gagal mengenerate jadwal otomatis");
+      }
+
+      localStorage.setItem(key, "true");
+    } catch (error) {
+      console.error("Error generating schedule:", error);
+    }
+  }
+
+  // ========================================================
+  // Event Handlers
+  // ========================================================
+
+  async function handleEntityNumberChange(e, targetNameField, targetIdField) {
+    const entityNo = e.target.value;
+    const targetNameElement = document.getElementById(targetNameField);
+    const targetIdElement = document.getElementById(targetIdField);
+
+    if (!targetNameElement || !targetIdElement) return;
+
+    if (entityNo) {
+      try {
+        const mesin = await fetchMesinByNumber(entityNo);
+        if (mesin) {
+          targetNameElement.value = mesin.entityName;
+          targetIdElement.value = mesin.id;
+        } else {
+          throw new Error("Mesin tidak ditemukan");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        targetNameElement.value = "";
+        targetIdElement.value = "";
+        alert("Mesin tidak ditemukan. Pastikan nomor entitas benar.");
+      }
+    } else {
+      targetNameElement.value = "";
+      targetIdElement.value = "";
+    }
+  }
+
+  // ========================================================
+  // Calendar Initialization
+  // ========================================================
   const calendar = new FullCalendar.Calendar(elements.calendar, {
     initialView: "dayGridMonth",
     headerToolbar: {
@@ -258,19 +291,11 @@ document.addEventListener("DOMContentLoaded", function () {
     eventTextColor: "#FFFFFF",
     selectable: true,
     dateClick: function (info) {
-      if (isTodayDate(info.date)) {
-        selectedDate = info.dateStr;
-        openModal();
-      } else {
-        alert("Anda hanya dapat menjadwalkan maintenance untuk hari ini.");
-      }
-    },
-    dayCellClassNames: function (arg) {
-      return !isTodayDate(arg.date) ? ["fc-day-disabled"] : [];
+      selectedDate = info.dateStr;
+      openModal();
     },
     eventClick: function (info) {
-      const event = info.event;
-      const props = event.extendedProps;
+      const props = info.event.extendedProps;
       alert(`
         Entitas: ${props.entityName}
         Jenis: ${props.action}
@@ -282,48 +307,39 @@ document.addEventListener("DOMContentLoaded", function () {
     events: async function (fetchInfo, successCallback, failureCallback) {
       try {
         const year = fetchInfo.start.getFullYear();
+        const month = fetchInfo.start.getMonth() + 1;
+
+        await saveAutomaticSchedule(year, month);
+
         const response = await fetch(
           `${API_BASE_URL}/maintenance/all-machines/year/${year}`
         );
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error("Failed to fetch events");
-        }
+        if (!response.ok) throw new Error("Failed to fetch events");
 
         const data = await response.json();
-        if (!Array.isArray(data)) {
-          throw new Error("Invalid data format");
-        }
+        const apiEvents = data.map((event) => ({
+          id: event.id,
+          title: `${event.mesin.entityNo} - ${event.action}`,
+          start: `${event.tahun}-${getMonthNumber(event.bulan)}-${event.tanggal
+            .toString()
+            .padStart(2, "0")}`,
+          allDay: true,
+          extendedProps: {
+            entityNo: event.mesin.entityNo,
+            entityName: event.mesin.entityName,
+            action: event.action,
+            description: event.description,
+            technician: event.technician,
+            isRescheduled: event.isRescheduled,
+            rescheduleReason: event.rescheduleReason,
+            status: event.status,
+          },
+          backgroundColor: event.isRescheduled ? "#e74c3c" : "#2ecc71",
+          borderColor: event.isRescheduled ? "#c0392b" : "#27ae60",
+          className: event.isRescheduled ? "reschedule-event" : "regular-event",
+        }));
 
-        const events = data.map((event) => {
-          const monthNum = getMonthNumber(event.bulan);
-          const day = event.tanggal.toString().padStart(2, "0");
-          const dateStr = `${event.tahun}-${monthNum}-${day}`;
-
-          return {
-            id: event.id,
-            title: `${event.mesin.entityNo} - ${event.action}`,
-            start: dateStr,
-            allDay: true,
-            extendedProps: {
-              entityNo: event.mesin.entityNo,
-              entityName: event.mesin.entityName,
-              action: event.action,
-              description: event.description,
-              technician: event.technician,
-              isRescheduled: event.isRescheduled,
-              rescheduleReason: event.rescheduleReason,
-              status: event.status,
-            },
-            backgroundColor: event.isRescheduled ? "#e74c3c" : "#2ecc71",
-            borderColor: event.isRescheduled ? "#c0392b" : "#27ae60",
-            className: event.isRescheduled
-              ? "reschedule-event"
-              : "regular-event",
-          };
-        });
-
-        successCallback(events);
+        successCallback(apiEvents);
       } catch (error) {
         console.error("Error fetching events:", error);
         failureCallback(error);
@@ -331,65 +347,18 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
-  async function handleEntityNumberChange(
-    e,
-    targetNameField,
-    targetIdField,
-    isReschedule = false
-  ) {
-    const entityNo = e.target.value;
-    const targetNameElement = document.getElementById(targetNameField);
-    const targetIdElement = document.getElementById(targetIdField);
-
-    if (!targetNameElement || !targetIdElement) {
-      console.error(
-        `Error: Element with ID ${targetNameField} or ${targetIdField} not found.`
-      );
-      return;
-    }
-
-    if (entityNo) {
-      try {
-        const mesin = await fetchMesinByNumber(entityNo);
-        if (mesin) {
-          targetNameElement.value = mesin.entityName;
-          targetIdElement.value = mesin.id;
-        } else {
-          throw new Error("Mesin tidak ditemukan");
-        }
-      } catch (error) {
-        console.error("Error in handleEntityNumberChange:", error);
-        targetNameElement.value = "";
-        targetIdElement.value = "";
-        if (!isReschedule) {
-          alert("Mesin tidak ditemukan. Pastikan nomor entitas benar.");
-        }
-      }
-    } else {
-      targetNameElement.value = "";
-      targetIdElement.value = "";
-    }
-  }
-
-  async function handleSaveEvent() {
-    const isReschedule =
-      document.querySelector('input[name="schedule-type"]:checked').value ===
-      "reschedule";
-    const success = await saveSchedule(isReschedule);
-
+  // ========================================================
+  // Event Listeners
+  // ========================================================
+  elements.saveButton?.addEventListener("click", async function () {
+    const success = await saveSchedule();
     if (success) {
       calendar.refetchEvents();
       closeModal();
     }
-  }
+  });
 
-  function handleScheduleTypeChange(e) {
-    const isReschedule = e.target.value === "reschedule";
-    elements.scheduleForm.style.display = isReschedule ? "none" : "block";
-    elements.rescheduleForm.style.display = isReschedule ? "block" : "none";
-  }
-
-  elements.printReportButton.addEventListener("click", async function () {
+  elements.printReportButton?.addEventListener("click", async function () {
     try {
       const currentDate = calendar.getDate();
       const year = currentDate.getFullYear();
@@ -398,28 +367,18 @@ document.addEventListener("DOMContentLoaded", function () {
       const response = await fetch(
         `${API_BASE_URL}/maintenance/report/monthly?year=${year}&month=${month}`
       );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error("Gagal mengambil laporan bulanan");
-      }
+      if (!response.ok) throw new Error("Gagal mengambil laporan");
 
       const data = await response.json();
-
       const printContent = `
         <h1>Laporan Pemeliharaan Bulanan</h1>
         <h2>Bulan: ${getMonthName(month)} ${year}</h2>
         <table border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse: collapse;">
           <thead>
             <tr>
-              <th>No</th>
-              <th>Tanggal</th>
-              <th>Nomor Entitas</th>
-              <th>Nama Entitas</th>
-              <th>Jenis Pemeliharaan</th>
-              <th>Teknisi</th>
-              <th>Status</th>
-              <th>Deskripsi</th>
+              <th>No</th><th>Tanggal</th><th>Nomor Entitas</th>
+              <th>Nama Entitas</th><th>Jenis Pemeliharaan</th>
+              <th>Teknisi</th><th>Status</th><th>Deskripsi</th>
             </tr>
           </thead>
           <tbody>
@@ -455,9 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
               th { background-color: #f2f2f2; }
             </style>
           </head>
-          <body>
-            ${printContent}
-          </body>
+          <body>${printContent}</body>
         </html>
       `);
       printWindow.document.close();
@@ -468,27 +425,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  elements.sche;
-  elements.scheduleTypeRadios.forEach((radio) => {
-    radio.addEventListener("change", handleScheduleTypeChange);
-  });
-
-  elements.entityNumber.addEventListener("change", (e) =>
-    handleEntityNumberChange(e, "entity-name", "mesin-id")
+  elements.rescheduleEntityNumber?.addEventListener("change", (e) =>
+    handleEntityNumberChange(e, "reschedule-entity-name", "reschedule-mesin-id")
   );
 
-  elements.rescheduleEntityNumber.addEventListener("change", (e) =>
-    handleEntityNumberChange(
-      e,
-      "reschedule-entity-name",
-      "reschedule-mesin-id",
-      true
-    )
-  );
+  elements.closeBtn?.addEventListener("click", closeModal);
 
-  elements.saveButton.addEventListener("click", handleSaveEvent);
-  elements.closeBtn.addEventListener("click", closeModal);
-
+  // ========================================================
+  // Initialization
+  // ========================================================
   calendar.render();
   populateMesinDropdown();
 });

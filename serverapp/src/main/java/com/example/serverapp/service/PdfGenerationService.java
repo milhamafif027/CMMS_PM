@@ -14,6 +14,9 @@ import java.util.List;
 public class PdfGenerationService {
 
     public byte[] generateMonthlyReportPdf(List<MaintenanceSchedule> schedules, String month, int year) throws DocumentException {
+            if (schedules.isEmpty()) {
+        throw new IllegalArgumentException("Tidak ada data jadwal untuk bulan: " + month + " tahun: " + year);
+    }
         Document document = new Document();
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PdfWriter.getInstance(document, outputStream);

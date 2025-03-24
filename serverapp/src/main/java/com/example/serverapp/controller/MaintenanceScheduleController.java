@@ -47,14 +47,23 @@ public class MaintenanceScheduleController {
 
     @PostMapping
     public ResponseEntity<MaintenanceSchedule> createSchedule(@RequestBody MaintenanceSchedule schedule) {
-        return ResponseEntity.ok(maintenanceService.saveSchedule(schedule));
+        MaintenanceSchedule savedSchedule = maintenanceService.saveSchedule(schedule);
+        return ResponseEntity.ok(savedSchedule);
+    }
+
+    @PutMapping("/reschedule/{id}")
+    public ResponseEntity<MaintenanceSchedule> rescheduleMaintenance(
+            @PathVariable Long id,
+            @RequestParam Integer newDate,
+            @RequestParam String reason) {
+        return ResponseEntity.ok(maintenanceService.rescheduleMaintenance(id, newDate, reason));
     }
 
     @GetMapping("/report/monthly")
     public ResponseEntity<List<MaintenanceSchedule>> getMonthlyReport(
             @RequestParam Integer year,
             @RequestParam Integer month) {
-        String monthName = maintenanceService.getMonthName(month); // Konversi angka bulan ke nama bulan
+        String monthName = maintenanceService.getMonthName(month);
         return ResponseEntity.ok(maintenanceService.getMonthlyReport(year, monthName));
     }
 
@@ -62,7 +71,7 @@ public class MaintenanceScheduleController {
     public ResponseEntity<byte[]> downloadMonthlyReportPdf(
             @RequestParam Integer year,
             @RequestParam Integer month) throws IOException, DocumentException {
-        String monthName = maintenanceService.getMonthName(month); // Konversi angka bulan ke nama bulan
+        String monthName = maintenanceService.getMonthName(month);
         List<MaintenanceSchedule> schedules = maintenanceService.getMonthlyReport(year, monthName);
         byte[] pdfBytes = pdfGenerationService.generateMonthlyReportPdf(schedules, monthName, year);
 
@@ -73,5 +82,19 @@ public class MaintenanceScheduleController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(pdfBytes);
+    }
+
+    @GetMapping("/automatic-schedule")
+    public ResponseEntity<String> generateAutomaticSchedule(
+            @RequestParam Integer year,
+            @RequestParam Integer month) {
+        maintenanceService.saveAutomaticSchedule(year, month);
+        return ResponseEntity.ok("Jadwal otomatis berhasil dibuat");
+    }
+
+    @GetMapping("/cleanup")
+    public ResponseEntity<String> cleanupSchedules() {
+        maintenanceService.cleanupInvalidSchedules();
+        return ResponseEntity.ok("Pembersihan jadwal tidak valid selesai");
     }
 }

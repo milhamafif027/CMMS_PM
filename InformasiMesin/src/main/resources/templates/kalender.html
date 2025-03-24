@@ -43,121 +43,73 @@
         </div>
       </section>
 
-      <!-- Modal untuk menambah/reschedule jadwal -->
-      <div class="modal-overlay"></div>
-      <div class="modal" id="event-modal">
-        <div class="modal-header">
-          Tambah Schedule Preventive Maintenance
-          <button type="button" class="close-btn" id="close-modal">
-            &times;
-          </button>
-        </div>
+      <!-- Modal untuk Reschedule -->
+      <div class="modal-overlay" id="event-modal-overlay">
+        <div class="modal" id="event-modal">
+          <div class="modal-header">
+            <h3>Reschedule Preventive Maintenance</h3>
+            <button type="button" class="close-btn" id="close-modal">
+              &times;
+            </button>
+          </div>
 
-        <!-- Pilihan Schedule atau Reschedule -->
-        <div class="input-group">
-          <label>Pilih Tipe:</label>
-          <div class="radio-group">
-            <label>
+          <!-- Form untuk Reschedule -->
+          <form id="reschedule-form">
+            <div class="input-group">
+              <label for="reschedule-entity-number">Nomor Entitas</label>
+              <select id="reschedule-entity-number" required>
+                <option value="">Pilih Nomor Entitas</option>
+                <!-- Opsi akan diisi oleh JavaScript -->
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="reschedule-entity-name">Nama Entitas</label>
               <input
-                type="radio"
-                name="schedule-type"
-                value="schedule"
-                checked
+                id="reschedule-entity-name"
+                type="text"
+                readonly
+                required
               />
-              Schedule
-            </label>
-            <label>
-              <input type="radio" name="schedule-type" value="reschedule" />
-              Reschedule
-            </label>
-          </div>
+              <input type="hidden" id="reschedule-mesin-id" />
+            </div>
+
+            <div class="input-group">
+              <label for="reschedule-reason">Alasan Reschedule</label>
+              <textarea
+                id="reschedule-reason"
+                placeholder="Masukkan alasan reschedule..."
+                required
+              ></textarea>
+            </div>
+
+            <div class="input-group">
+              <label for="reschedule-maintenance-type"
+                >Jenis Pemeliharaan</label
+              >
+              <input
+                type="text"
+                id="reschedule-maintenance-type"
+                placeholder="Masukkan jenis pemeliharaan..."
+                required
+              />
+            </div>
+
+            <div class="input-group">
+              <label for="reschedule-technician">Teknisi</label>
+              <input
+                type="text"
+                id="reschedule-technician"
+                placeholder="Masukkan nama teknisi..."
+                required
+              />
+            </div>
+
+            <button type="button" id="save-event" class="btn btn-save">
+              Simpan
+            </button>
+          </form>
         </div>
-
-        <!-- Form untuk Schedule -->
-        <div id="schedule-form">
-          <div class="input-group">
-            <label for="entity-number">Nomor Entitas</label>
-            <select id="entity-number">
-              <option value="">Pilih Nomor Entitas</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="entity-name">Nama Entitas</label>
-            <input type="text" id="entity-name" readonly />
-          </div>
-
-          <div class="input-group">
-            <label for="maintenance-type">Jenis Pemeliharaan</label>
-            <input
-              type="text"
-              id="maintenance-type"
-              placeholder="Masukkan jenis pemeliharaan..."
-            />
-          </div>
-
-          <div class="input-group">
-            <label for="description">Deskripsi</label>
-            <textarea
-              id="description"
-              placeholder="Masukkan deskripsi pemeliharaan..."
-            ></textarea>
-          </div>
-
-          <div class="input-group">
-            <label for="technician">Teknisi</label>
-            <input
-              type="text"
-              id="technician"
-              placeholder="Masukkan nama teknisi..."
-            />
-            <input type="hidden" id="mesin-id" />
-          </div>
-        </div>
-
-        <!-- Form untuk Reschedule -->
-        <div id="reschedule-form" style="display: none">
-          <div class="input-group">
-            <label for="reschedule-entity-number">Nomor Entitas</label>
-            <select id="reschedule-entity-number">
-              <option value="">Pilih Nomor Entitas</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="reschedule-entity-name">Nama Entitas</label>
-            <input id="reschedule-entity-name" type="text" readonly />
-            <input type="hidden" id="reschedule-mesin-id" />
-          </div>
-
-          <div class="input-group">
-            <label for="reschedule-reason">Alasan Reschedule</label>
-            <textarea
-              id="reschedule-reason"
-              placeholder="Masukkan alasan reschedule..."
-            ></textarea>
-          </div>
-
-          <div class="input-group">
-            <label for="reschedule-maintenance-type">Jenis Pemeliharaan</label>
-            <input
-              type="text"
-              id="reschedule-maintenance-type"
-              placeholder="Masukkan jenis pemeliharaan..."
-            />
-          </div>
-
-          <div class="input-group">
-            <label for="reschedule-technician">Teknisi</label>
-            <input
-              type="text"
-              id="reschedule-technician"
-              placeholder="Masukkan nama teknisi..."
-            />
-          </div>
-        </div>
-
-        <button id="save-event" class="btn btn-save">Simpan</button>
       </div>
     </div>
   </body>

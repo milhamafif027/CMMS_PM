@@ -11,7 +11,7 @@ public class MaintenanceSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST) // atau CascadeType.ALL
     @JoinColumn(name = "mesin_id")
     private Mesin mesin;
 
