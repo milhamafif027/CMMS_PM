@@ -1,17 +1,30 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/mesin_db
+    url: jdbc:mysql://localhost:3306/mesin_db?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: 
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:  # Menambahkan pengaturan pooling dengan HikariCP (lebih cepat & efisien)
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 20000
+
   jpa:
+    database: mysql
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: update  # Bisa diganti "validate" di production agar tidak mengubah skema otomatis
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect  # Gunakan versi terbaru jika MySQL >= 8
+        format_sql: true  # Memformat query SQL agar lebih mudah dibaca di log
+        show_sql: false  # Ubah ke true jika ingin melihat query di log
+
+  session:
+    store-type: jdbc  # Simpan session di database
 
 server:
   port: 8080
+  error:
+    include-message: always

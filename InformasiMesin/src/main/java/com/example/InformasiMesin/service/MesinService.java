@@ -15,6 +15,7 @@ public class MesinService {
         return mesinRepository.findAll();
     }
 
+
     public Mesin getMesinById(Long id) {
         return mesinRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mesin not found"));

@@ -8,12 +8,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class DashboardController {
 
     @GetMapping("/")
-    public String index(Model model) {
+    public String showDashboard(Model model) {
         model.addAttribute("activePage", "index");
         return "index";
     }
+
     @GetMapping("/kalender")
-    public String kalender(Model model) {
+    public String showCalendar(Model model) {
         model.addAttribute("activePage", "kalender");
         return "kalender";
     }
