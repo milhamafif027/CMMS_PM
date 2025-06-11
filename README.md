@@ -1,12 +1,16 @@
+![image](https://github.com/user-attachments/assets/d742d6d3-b5ee-4499-ab52-5520120027fb)# Computerized Maintenance Management System Preventive
+## Sistem ini dikembangkan untuk mempermudah akses dan pengelolaan laporan preventive maintenance dengan memastikan setiap mesin menjalani perawatan sesuai jadwal mingguan yang telah ditentukan.
+
+
 ## ServerApp : Back End
 ## InformasiMesin : Front End
 
-
 # Tampilan Page Informasi Mesin (Dashboard) 
-![image](https://github.com/user-attachments/assets/3f12ede6-75eb-4036-9724-e2dce74b9029)
-![image](https://github.com/user-attachments/assets/ed844a57-f7ef-4c05-b532-7e057ee76c36)
-![image](https://github.com/user-attachments/assets/5621ace8-e543-43e4-8355-9eb6f503dbd6)
-![image](https://github.com/user-attachments/assets/d12e0cbe-0f3c-4f46-b6f0-407f2003fdc3)
+![image](https://github.com/user-attachments/assets/d3a4b9ff-f723-4836-876d-081576f833d4)
+![image](https://github.com/user-attachments/assets/c576a559-8e89-4ecd-8cbe-220cfbafb68a)
+![image](https://github.com/user-attachments/assets/3d22380e-9ad0-46a2-af64-a35dd36a0913)
+![image](https://github.com/user-attachments/assets/9a3d1c5b-70b9-4ae4-b14f-4d5ba301d87d)
+
 
 # Tampilan Page Kalender 
 ![image](https://github.com/user-attachments/assets/5da4014c-4ef1-418e-b027-046632dac5af)
