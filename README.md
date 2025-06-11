@@ -1,9 +1,9 @@
 # Computerized Maintenance Management System Preventive
 ### Sistem ini dikembangkan untuk mempermudah akses dan pengelolaan laporan preventive maintenance dengan memastikan setiap mesin menjalani perawatan sesuai jadwal mingguan yang telah ditentukan.
 
-##Folder :
-# ServerApp : Back End
-# InformasiMesin : Front End
+## Folder :
+### ServerApp : Back End
+### InformasiMesin : Front End
 
 ## Tampilan Page Informasi Mesin (Dashboard) 
 ![image](https://github.com/user-attachments/assets/d3a4b9ff-f723-4836-876d-081576f833d4)
