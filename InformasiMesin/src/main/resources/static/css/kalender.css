@@ -4,7 +4,7 @@
 :root {
   --primary-color: #2c3e50;
   --secondary-color: #27ae60; /* Warna hijau utama */
-  --success-color: #2ecc71; /* Warna hijau sekunder */
+  --success-color: #19ad57; /* Warna hijau sekunder */
   --background-color: #ecf0f1;
   --text-color: #2c3e50;
   --border-radius: 12px;
@@ -397,8 +397,8 @@ select option:hover {
 
 /* CSS untuk event regular */
 .regular-event {
-  background-color: #2ecc71 !important; /* Warna hijau */
-  border-color: #27ae60 !important; /* Warna border hijau */
+  background-color: #2aa35d !important; /* Warna hijau */
+  border-color: #259755 !important; /* Warna border hijau */
   color: white !important; /* Warna teks putih */
 }
 

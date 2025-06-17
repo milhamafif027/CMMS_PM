@@ -7,9 +7,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title
-      layout:title-pattern="$CONTENT_TITLE - Preventive Maintenance"
-    ></title>
+    <title layout:title-pattern="$CONTENT_TITLE - Preventive Maintenance"></title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -21,14 +19,14 @@
     <!-- Sidebar -->
     <div class="sidebar">
       <div class="logo">
-        <img src="image/logo tel.jpg" alt="Preventive Maintenance Logo" />
+        <img th:src="@{/image/logo tel.jpg}" alt="Preventive Maintenance Logo" />
       </div>
       <ul class="menu">
         <li
           class="menu-item"
           th:classappend="${activePage == 'index' ? 'active' : ''}"
         >
-          <a th:href="@{/}">
+          <a th:href="@{/mesin}">
             <i class="fas fa-home"></i> <span>Dashboard</span>
           </a>
         </li>
@@ -50,8 +48,8 @@
         <h1 layout:fragment="title">Dashboard</h1>
         <div class="user-profile">
           <i class="fas fa-user-circle"></i>
-          <span>Andi - Suvervisor</span>
-          <button class="btn btn-danger">Logout</button>
+          <span>Supervisor</span>
+          <button class="btn btn-danger" id="logout-btn">Keluar</button>
         </div>
       </header>
 
@@ -63,5 +61,9 @@
         &copy; 2025 Preventive Maintenance - All rights reserved.
       </footer>
     </div>
+
+    <!-- JS untuk Logout -->
+    <script th:src="@{/js/layout.js}"></script>
+    <th:block layout:fragment="js"></th:block>
   </body>
 </html>

@@ -98,7 +98,7 @@ body {
 }
 
 .filter-title {
-  color: #08b813;
+  color: #118d1a;
   font-size: 1.3rem;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -126,7 +126,7 @@ body {
 }
 
 .filter-group input:focus {
-  border-color: #08b813;
+  border-color: #118d1a;
   outline: none;
   box-shadow: 0 0 0 3px rgba(8, 184, 19, 0.1);
 }
@@ -157,7 +157,7 @@ td {
 
 th {
   background-color: #f8fafc;
-  color: #08b813;
+  color: #118d1a;
   font-weight: 600;
   position: sticky;
   top: 0;
@@ -285,10 +285,32 @@ tbody tr:hover {
 }
 
 .modal-header h3 {
-  color: #08b813;
+  color: #118d1a;
   font-size: 1.4rem;
   font-weight: 600;
   margin: 0;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detail-table td {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  vertical-align: top;
+}
+
+.detail-table td:first-child {
+  font-weight: 600;
+  color: #333;
+  background-color: #f9f9f9;
+  width: 40%;
+}
+
+.detail-table td:last-child {
+  color: #555;
 }
 
 /* Close Button */
@@ -338,7 +360,7 @@ tbody tr:hover {
 }
 
 .form-group input:focus {
-  border-color: #08b813;
+  border-color: #118d1a;
   outline: none;
   background: white;
   box-shadow: 0 0 0 4px rgba(8, 184, 19, 0.1);

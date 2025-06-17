@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class DashboardController {
 
-    @GetMapping("/")
+    @GetMapping("/mesin")
     public String index(Model model) {
         model.addAttribute("activePage", "index");
         return "index";
@@ -17,4 +17,11 @@ public class DashboardController {
         model.addAttribute("activePage", "kalender");
         return "kalender";
     }
+
+    @GetMapping("/")
+    public String welcomePage (Model model) {
+        model.addAttribute("activePage", "welcomePage");
+        return "welcomePage";
+    }
+
 }

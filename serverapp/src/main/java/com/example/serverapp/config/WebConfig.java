@@ -12,8 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(false); // Set ke false jika menggunakan wildcard
+                .allowCredentials(false);
     }
 
 }
-
